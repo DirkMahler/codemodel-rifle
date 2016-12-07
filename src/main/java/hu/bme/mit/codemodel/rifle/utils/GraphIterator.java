@@ -5,10 +5,7 @@ import com.shapesecurity.functional.data.*;
 import com.shapesecurity.shift.ast.SourceSpan;
 import com.shapesecurity.shift.parser.ParserWithLocation;
 import com.shapesecurity.shift.scope.Scope;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.RelationshipType;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -34,10 +31,11 @@ public class GraphIterator {
         this.parserWithLocation = parserWithLocation;
     }
 
-    public void iterate(Scope scope, String sessionId) {
+    public Node iterate(Scope scope, String sessionId) {
+        Node pathNode = null;
         try (Transaction tx = dbServices.beginTx()) {
 
-            createPathNode(sessionId, tx);
+            pathNode = createPathNode(sessionId, tx);
             queue.add(new QueueItem(null, null, scope));
 
             while (!queue.isEmpty()) {
@@ -49,12 +47,14 @@ public class GraphIterator {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        return pathNode;
     }
 
-    protected void createPathNode(String sessionId, Transaction tx) {
-        storeType(tx, path, "CompilationUnit");
+    protected Node createPathNode(String sessionId, Transaction tx) {
+        Node compilationUnit = storeType(tx, path, "CompilationUnit");
         storeProperty(tx, path, "path", path);
         storeProperty(tx, path, "session", sessionId);
+        return compilationUnit;
     }
 
     protected void process(QueueItem queueItem, Transaction tx, String sessionId) {
@@ -333,7 +333,7 @@ public class GraphIterator {
         }
         Node a = findOrCreate(tx, subject);
         Node b = findOrCreate(tx, object);
-        a.createRelationshipTo(b, RelationshipType.withName(predicate));
+        a.createRelationshipTo(b, DynamicRelationshipType.withName(predicate));
     }
 
     public void storeProperty(Transaction tx, Object subject, String predicate, Object object) {
@@ -344,13 +344,14 @@ public class GraphIterator {
         node.setProperty(predicate, object);
     }
 
-    public void storeType(Transaction tx, Object subject, String type) {
+    public Node storeType(Transaction tx, Object subject, String type) {
         if (type == null || type.length() == 0) {
-            return;
+            return null;
         }
 
         Node node = findOrCreate(tx, subject);
-        node.addLabel(Label.label(type));
+        node.addLabel(DynamicLabel.label(type));
+        return node;
     }
 
     // http://stackoverflow.com/questions/3567372/access-to-private-inherited-fields-via-reflection-in-java

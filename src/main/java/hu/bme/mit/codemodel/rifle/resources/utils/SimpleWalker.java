@@ -18,19 +18,19 @@ public class SimpleWalker extends Walker {
     @Override
     public <R, E extends Throwable> R accept(Visitor<R, E> visitor) throws E {
         for (Node node : dbServices.graphDb.getAllNodes()) {
-            if (node.hasLabel(Label.label("CompilationUnit"))) {
+            if (node.hasLabel(DynamicLabel.label("CompilationUnit"))) {
                 continue;
             }
-            if (node.hasLabel(Label.label("SourceSpan"))) {
+            if (node.hasLabel(DynamicLabel.label("SourceSpan"))) {
                 continue;
             }
-            if (node.hasLabel(Label.label("SourceLocation"))) {
+            if (node.hasLabel(DynamicLabel.label("SourceLocation"))) {
                 continue;
             }
 
             visitor.visitNode(node);
             for (Relationship edge : node.getRelationships(Direction.OUTGOING)) {
-                if (edge.isType(RelationshipType.withName("location"))) {
+                if (edge.isType(DynamicRelationshipType.withName("location"))) {
                     continue;
                 }
                 visitor.visitRelationship(edge);

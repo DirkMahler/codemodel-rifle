@@ -42,8 +42,8 @@ public class HandleChange {
         setCommitHashInNewTransaction(branchid, commithash);
 
         try {
-            parseFile(sessionid, path, content, branchid);
-
+            DbServices dbServices = DbServicesManager.getDbServices(branchid);
+            new Parser(dbServices).parseFile(sessionid, path, content);
             // TODO provide URI for the parsed content?
             return Response.created(URI.create("")).build();
         } catch (JsError jsError) {
@@ -90,16 +90,6 @@ public class HandleChange {
         } else {
             return Response.serverError().build();
         }
-    }
-
-
-    protected void parseFile(String sessionid, String path, String content, String branchid) throws JsError {
-        ParserWithLocation parser = new ParserWithLocation();
-        Module module = parser.parseModule(content);
-
-        GlobalScope scope = ScopeAnalyzer.analyze(module);
-        GraphIterator iterator = new GraphIterator(DbServicesManager.getDbServices(branchid), path, parser);
-        iterator.iterate(scope, sessionid);
     }
 
     protected boolean removeFile(String sessionid, String path, String branchid, String commithash) {

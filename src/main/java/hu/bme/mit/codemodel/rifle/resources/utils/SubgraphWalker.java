@@ -51,19 +51,19 @@ public class SubgraphWalker extends Walker {
         for (Node node : nodes) {
 
             if (simple) {
-                if (node.hasLabel(Label.label("CompilationUnit"))) {
+                if (node.hasLabel(DynamicLabel.label("CompilationUnit"))) {
                     continue; // filternodes;
                 }
-                if (node.hasLabel(Label.label("SourceSpan"))) {
+                if (node.hasLabel(DynamicLabel.label("SourceSpan"))) {
                     continue; // filternodes;
                 }
-                if (node.hasLabel(Label.label("SourceLocation"))) {
+                if (node.hasLabel(DynamicLabel.label("SourceLocation"))) {
                     continue; // filternodes;
                 }
             }
 
             if (!cfg) {
-                if (node.hasLabel(Label.label("End"))) {
+                if (node.hasLabel(DynamicLabel.label("End"))) {
                     continue; // filternodes;
                 }
             }
@@ -71,24 +71,24 @@ public class SubgraphWalker extends Walker {
             visitor.visitNode(node);
             for (Relationship relationship : node.getRelationships(Direction.OUTGOING)) {
                 if (nodes.contains(relationship.getOtherNode(node))) {
-                    if (relationship.isType(RelationshipType.withName("location"))) {
+                    if (relationship.isType(DynamicRelationshipType.withName("location"))) {
                         continue;
                     }
 
                     if (!cfg) {
-                        if (relationship.isType(RelationshipType.withName("_end"))) {
+                        if (relationship.isType(DynamicRelationshipType.withName("_end"))) {
                             continue;
                         }
-                        if (relationship.isType(RelationshipType.withName("_next"))) {
+                        if (relationship.isType(DynamicRelationshipType.withName("_next"))) {
                             continue;
                         }
-                        if (relationship.isType(RelationshipType.withName("_true"))) {
+                        if (relationship.isType(DynamicRelationshipType.withName("_true"))) {
                             continue;
                         }
-                        if (relationship.isType(RelationshipType.withName("_false"))) {
+                        if (relationship.isType(DynamicRelationshipType.withName("_false"))) {
                             continue;
                         }
-                        if (relationship.isType(RelationshipType.withName("_normal"))) {
+                        if (relationship.isType(DynamicRelationshipType.withName("_normal"))) {
                             continue;
                         }
                     }
