@@ -1,5 +1,3 @@
-{
-    var helloWorld = function() {
-        alert('Hello World');
-    };
-}
+var helloWorld = function () {
+    alert('Hello World');
+};
