@@ -5,14 +5,23 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>hu.bme.mit.codemodel</groupId>
-    <artifactId>rifle</artifactId>
+    <artifactId>rifle-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+
     <properties>
-        <neo4j.version>2.3.8</neo4j.version>
-        <jqassistant.version>1.1.4</jqassistant.version>
+        <neo4j.version>3.0.0</neo4j.version>
     </properties>
 
-    <packaging>jar</packaging>
+    <repositories>
+        <repository>
+            <id>snapshot-repository.java.net</id>
+            <name>Java.net Snapshot Repository for Maven</name>
+            <url>https://maven.java.net/content/repositories/snapshots/</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
@@ -24,146 +33,13 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>hu.bme.mit.codemodel.rifle.WebApplication</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>com.jolira</groupId>
-                <artifactId>onejar-maven-plugin</artifactId>
-                <version>1.4.4</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>one-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>snapshot-repository.java.net</id>
-            <name>Java.net Snapshot Repository for Maven</name>
-            <url>https://maven.java.net/content/repositories/snapshots/</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.jhades</groupId>
-            <artifactId>jhades</artifactId>
-            <version>LATEST</version>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j</artifactId>
-            <version>${neo4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.neo4j.app</groupId>
-            <artifactId>neo4j-server</artifactId>
-            <version>${neo4j.version}</version>
-
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.ws.rs</groupId>
-                    <artifactId>jsr311-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.neo4j.3rdparty.javax.ws.rs</groupId>
-                    <artifactId>jsr311-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-server</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-graphviz</artifactId>
-            <version>${neo4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.shapesecurity</groupId>
-            <artifactId>shift</artifactId>
-            <version>2.2.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-grizzly2-http</artifactId>
-            <version>2.22.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-moxy</artifactId>
-            <version>2.22.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>net.jodah</groupId>
-            <artifactId>failsafe</artifactId>
-            <version>0.8.3</version>
-        </dependency>
-
-        <!-- jQA Deps -->
-        <dependency>
-            <groupId>com.buschmais.jqassistant.core</groupId>
-            <artifactId>jqassistant.core.store</artifactId>
-            <version>${jqassistant.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.buschmais.jqassistant.core</groupId>
-            <artifactId>jqassistant.core.scanner</artifactId>
-            <version>${jqassistant.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.buschmais.jqassistant.core</groupId>
-            <artifactId>jqassistant.core.plugin</artifactId>
-            <version>${jqassistant.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.buschmais.jqassistant.plugin</groupId>
-            <artifactId>jqassistant.plugin.common</artifactId>
-            <version>${jqassistant.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.buschmais.jqassistant.plugin</groupId>
-            <artifactId>jqassistant.plugin.common</artifactId>
-            <type>test-jar</type>
-            <version>${jqassistant.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- JUnit -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-        </dependency>
-    </dependencies>
-
+    <modules>
+        <module>parser</module>
+        <module>neo4j-extension</module>
+        <module>jqassistant-plugin</module>
+    </modules>
 
 </project>
