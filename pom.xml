@@ -11,17 +11,8 @@
     <packaging>pom</packaging>
 
     <properties>
-        <neo4j.version>3.0.0</neo4j.version>
+        <neo4j.version>3.0.7</neo4j.version>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>snapshot-repository.java.net</id>
-            <name>Java.net Snapshot Repository for Maven</name>
-            <url>https://maven.java.net/content/repositories/snapshots/</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
 
     <build>
         <plugins>
@@ -38,7 +29,7 @@
 
     <modules>
         <module>parser</module>
-        <module>neo4j-extension</module>
+        <module>web-server</module>
         <module>jqassistant-plugin</module>
     </modules>
 
