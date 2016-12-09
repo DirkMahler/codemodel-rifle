@@ -48,7 +48,7 @@ public class JavaScriptFileScannerPlugin extends AbstractScannerPlugin<FileResou
         try (InputStream stream = fileResource.createStream()) {
             try {
                 store.commitTransaction();
-                node = parser.parseFile("1", path, IOUtils.toString(stream));
+                node = parser.parseFile(null, path, IOUtils.toString(stream));
                 store.beginTransaction();
             } catch (JsError jsError) {
                 throw new IOException("Cannot parse file " + path, jsError);

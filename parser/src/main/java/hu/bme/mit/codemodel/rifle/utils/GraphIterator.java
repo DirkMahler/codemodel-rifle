@@ -5,6 +5,8 @@ import com.shapesecurity.functional.data.*;
 import com.shapesecurity.shift.ast.SourceSpan;
 import com.shapesecurity.shift.parser.ParserWithLocation;
 import com.shapesecurity.shift.scope.Scope;
+import hu.bme.mit.codemodel.rifle.resources.JavaScriptLabel;
+import hu.bme.mit.codemodel.rifle.resources.JavaScriptRelationshipType;
 import org.neo4j.graphdb.*;
 
 import java.lang.reflect.Field;
@@ -51,7 +53,7 @@ public class GraphIterator {
     }
 
     protected Node createPathNode(String sessionId) {
-        Node compilationUnit = storeType(path, "CompilationUnit");
+        Node compilationUnit = storeType(path, JavaScriptLabel.CompilationUnit);
         storeProperty(path, "path", path);
         storeProperty(path, "session", sessionId);
         return compilationUnit;
@@ -121,7 +123,7 @@ public class GraphIterator {
      */
     protected void handleIfInSession(String sessionId, Object node) {
         if (sessionId != null) {
-            storeType(node, "Temp");
+            storeType(node, JavaScriptLabel.Temp);
             storeProperty(node, "session", sessionId);
         }
     }
@@ -138,8 +140,8 @@ public class GraphIterator {
 
             // id -- [field] -> list
             storeReference(parent, predicate, list);
-            storeType(list, "List");
-            storeReference(path, "contains", list);
+            storeType(list, JavaScriptLabel.List);
+            storeReference(path, JavaScriptRelationshipType.contains, list);
             handleIfInSession(sessionId, list);
 
             final Iterator iterator = list.iterator();
@@ -162,7 +164,7 @@ public class GraphIterator {
                 i++;
             }
 
-            storeReference(list, "last", prev);
+            storeReference(list, JavaScriptRelationshipType.last, prev);
             createEndNode(list, sessionId);
 
         } else if (node instanceof Map) {
@@ -173,8 +175,8 @@ public class GraphIterator {
                 // id -- [field] -> table
                 storeReference(parent, predicate, map);
 //                storeType(tx, map, node.getClass().getSimpleName());
-                storeType(map, "Map");
-                storeReference(path, "contains", map);
+                storeType(map, JavaScriptLabel.Map);
+                storeReference(path, JavaScriptRelationshipType.contains, map);
                 handleIfInSession(sessionId, map);
 
                 for (Object el : map.entrySet()) {
@@ -190,8 +192,8 @@ public class GraphIterator {
             if (table.length > 0) {
                 // id -- [field] -> table
                 storeReference(parent, predicate, table);
-                storeType(table, "HashTable");
-                storeReference(path, "contains", table);
+                storeType(table, JavaScriptLabel.HashTable);
+                storeReference(path, JavaScriptRelationshipType.contains, table);
                 handleIfInSession(sessionId, table);
 
                 for (Object el : table.entries()) {
@@ -216,7 +218,7 @@ public class GraphIterator {
 
         createEndNode(node, sessionId);
 
-        storeReference(path, "contains", node);
+        storeReference(path, JavaScriptRelationshipType.contains, node);
         handleIfInSession(sessionId, node);
         storeLocation(node);
 
@@ -230,7 +232,7 @@ public class GraphIterator {
             storeType(node, interfaceName);
             
             if (interfaceName.startsWith("Literal")) {
-                storeType(node, "Literal");
+                storeType(node, JavaScriptLabel.Literal);
             }
         });
 
@@ -280,10 +282,10 @@ public class GraphIterator {
 
     protected void createEndNode(Object node, String sessionId) {
         Object end = new Object();
-        storeType(end, "End");
-        storeReference(node, "_end", end);
+        storeType(end, JavaScriptLabel.End);
+        storeReference(node, JavaScriptRelationshipType._end, end);
         storeProperty(node, "session", sessionId);
-        storeReference(path, "contains", end);
+        storeReference(path, JavaScriptRelationshipType.contains, end);
     }
 
     protected void storeLocation(Object node) {
@@ -326,14 +328,17 @@ public class GraphIterator {
     }
 
     public void storeReference(Object subject, String predicate, Object object) {
+        storeReference(subject, dbServices.getRelationshipType(predicate), object);
+    }
+
+    public void storeReference(Object subject, RelationshipType predicate, Object object) {
         if (subject == null || object == null) {
             return;
         }
         Node a = findOrCreate(subject);
         Node b = findOrCreate(object);
-        a.createRelationshipTo(b, dbServices.getRelationshipType(predicate));
+        a.createRelationshipTo(b, predicate);
     }
-
 
     public void storeProperty(Object subject, String predicate, Object object) {
         if (object == null) {
@@ -347,9 +352,12 @@ public class GraphIterator {
         if (type == null || type.length() == 0) {
             return null;
         }
+        return storeType(subject, dbServices.getLabel(type));
+    }
 
+    public Node storeType(Object subject, Label type) {
         Node node = findOrCreate(subject);
-        node.addLabel(dbServices.getLabel(type));
+        node.addLabel(type);
         return node;
     }
 
